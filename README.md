@@ -7,11 +7,11 @@ I create an ensemble of N BERT models, by training every model on (N-1)/N observ
 
 Reasoning for using ensemble:
 
-1) *I want to be able to train all the available data.* If I train on 80% of the data, and use 20% for validation, then I am not using 20% of the data to make my model smarter.
+1) *I want to be able to train all available data.* If I train on 80% of the data, and use 20% for validation, then I am not using 20% of the data to make my model smarter.
 
-2) *I want to have a validation set.* I could train on 100% of the data, but then I would not know if my model is overfitting and the training needs to be stopped.
+2) *I want to have a validation set.* I could train on 100% of the data, but then I would not know if my model is overfitting and training needs to stop.
 
-3) *Ensembles outperform single models.* It has been shown in the literature that ensembles of models trained on the same data (just different initial weight allocations) outperform single models. I believe the fact tha I am training the models on different, though slightly, data makes ensembles even more powerful. 
+3) *Ensembles outperform single models.* It has been shown in the literature that ensembles of models trained on the same data (just different initial weight allocations) outperform single models. I believe the fact that I am training the models on different, though slightly, data makes ensembles even more powerful. 
 
 
 
@@ -33,6 +33,6 @@ python src/bert_model/predictor.py
 
 Result:
 
-The highest score I achieved is 0.83941.
+The highest score I achieved is F1 score of 0.83941.
 
 
