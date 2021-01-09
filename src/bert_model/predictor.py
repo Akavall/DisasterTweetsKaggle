@@ -16,7 +16,6 @@ sys.path.append(os.getcwd())
 
 from src.bert_model import parameters as p
 from src import data_sources as ds
-from src.catboost import parameters as cb_p
 
 def predict(model, tokenizer, loss_desc_list, df_part, device, batch_size=128):
 
