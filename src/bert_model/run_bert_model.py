@@ -240,7 +240,7 @@ if __name__ == "__main__":
         device = torch.device("cpu")
         print("GPU not available, CPU used")
 
-    print("running with bert uncased...")
+    print(f"running: {p.PRE_TRAINED_MODEL_NAME}")
     print(f"using N_SUBSET of: {p.N_SUBSET}")
 
     df = pd.read_csv(ds.TRAIN_FILE_PATH)[:p.N_SUBSET]
