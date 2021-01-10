@@ -17,7 +17,7 @@ sys.path.append(os.getcwd())
 from src.bert_model import parameters as p
 from src import data_sources as ds
 
-def predict(model, tokenizer, loss_desc_list, df_part, device, batch_size=128):
+def predict(model, tokenizer, loss_desc_list, df_part, device, batch_size):
 
     encoded_plus_list = []
 
@@ -35,34 +35,25 @@ def predict(model, tokenizer, loss_desc_list, df_part, device, batch_size=128):
 
         encoded_plus_list.append(encoded_plus)
 
-    all_preds = []
+    step_1 = [ele["input_ids"] for ele in encoded_plus_list]
 
-    for i in range(len(encoded_plus_list) // batch_size + 1):
+    input_ids = torch.stack(step_1).squeeze()
+    input_ids = input_ids.to(device)
 
-        this_batch = encoded_plus_list[i * batch_size : (i + 1) * batch_size]
+    step_1 = [ele["attention_mask"] for ele in encoded_plus_list]
+    attention_mask = torch.stack(step_1).squeeze()
+    attention_mask = attention_mask.to(device)
 
-        step_1 = [ele["input_ids"] for ele in this_batch]
+    with torch.no_grad():
 
-        if len(step_1) == 0:
-            continue
+        probs = model(
+            input_ids=input_ids,
+            attention_mask=attention_mask
+        )
 
-        input_ids = torch.stack(step_1).squeeze()
-        input_ids = input_ids.to(device)
+        _, preds_bert = torch.max(probs, dim=1)
 
-        step_1 = [ele["attention_mask"] for ele in this_batch]
-        attention_mask = torch.stack(step_1).squeeze()
-        attention_mask = attention_mask.to(device)
-
-        with torch.no_grad():
-
-            probs = model(
-                input_ids=input_ids,
-                attention_mask=attention_mask
-            )
-
-            _, preds_bert = torch.max(probs, dim=1)
-
-        return preds_bert
+    return preds_bert
 
 
 if __name__ == "__main__":
@@ -111,13 +102,17 @@ if __name__ == "__main__":
 
             this_batch_preds_bert = []
 
-            preds_bert = predict(model, tokenizer, text_list, df_part, device)
-            this_model_preds_bert.append(preds_bert.cpu().detach().numpy())
+            preds_bert = predict(model, tokenizer, text_list, df_part, device, p.PRED_BATCH_SIZE)
+            preds_bert_cpu = preds_bert.cpu().detach().numpy()
+            this_model_preds_bert.append(preds_bert_cpu)
 
             if i == 0:
                 print(f"model: {j}")
-                print(f"preds_bert: {preds_bert}")
+                print(f"preds_bert: {preds_bert_cpu}")
 
+        del model 
+        del preds_bert
+        torch.cuda.empty_cache()
 
         this_model_preds_array_bert = np.concatenate(this_model_preds_bert)
 
