@@ -19,6 +19,7 @@ from copy import deepcopy
 
 import sys 
 import os 
+import gc
 
 sys.path.append(os.getcwd())
 
@@ -296,6 +297,11 @@ if __name__ == "__main__":
 
         f1_scores.append(f1_score)
         cf_matrixes.append(cf_matrix)
+
+        number_of_garbage_objects = gc.collect()
+        print(f"number of garbage objects: {number_of_garbage_objects}")
+
+
     
     print("f1_scores:")
     print(f1_scores)

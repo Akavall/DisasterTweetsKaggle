@@ -14,6 +14,8 @@ import os
 
 sys.path.append(os.getcwd())
 
+import gc
+
 from src.bert_model import parameters as p
 from src import data_sources as ds
 
@@ -88,6 +90,8 @@ if __name__ == "__main__":
         model = Classifier(n_classes=p.N_CLASSES).to(device)
         model.load_state_dict(torch.load(p.NEW_MODEL_NAME.format(j)))
 
+        model.eval()
+
         print(f"processing model: {j}")
 
         this_model_preds_bert = []
@@ -110,9 +114,8 @@ if __name__ == "__main__":
                 print(f"model: {j}")
                 print(f"preds_bert: {preds_bert_cpu}")
 
-        del model 
-        del preds_bert
-        torch.cuda.empty_cache()
+        number_of_garbage_objects = gc.collect()
+        print(f"number of garbage objects: {number_of_garbage_objects}")
 
         this_model_preds_array_bert = np.concatenate(this_model_preds_bert)
 
